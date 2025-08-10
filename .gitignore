@@ -1,0 +1,139 @@
+# Dependencies
+/node_modules
+node_modules/
+.pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.dev.vars
+
+# Build outputs
+.svelte-kit/
+build/
+dist/
+.vercel/
+.netlify/
+
+# Database
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+local.db*
+/local.db
+
+# Cloudflare
+.wrangler/
+.miniflare/
+.mf/
+
+# IDE and editor files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+playwright-report/
+playwright/.cache/
+test-results/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Package manager
+.npm/
+.yarn/
+.pnpm-store/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+
+# Backup files
+*.backup
+*.bak
+
+# Drizzle
+drizzle/meta/
+.drizzle/
+
+# TypeScript
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variable files
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Stripe CLI
+stripe.exe
+stripe
+
+# Generated files
+/src/lib/paraglide/messages/
+/src/lib/paraglide/runtime.js
+
+# Certificates
+*.pem
+*.key
+*.crt
+*.cer
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Claude
+.claude/cache/
