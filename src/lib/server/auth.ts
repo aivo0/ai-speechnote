@@ -55,9 +55,7 @@ export function createAuth(db: Database, env: any) {
 			}
 		},
 		rateLimit: {
-			enabled: true,
-			window: 10 * 60, // 10 minutes
-			max: 10
+			enabled: false // Disable for local development
 		}
 	});
 }

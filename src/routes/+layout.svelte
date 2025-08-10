@@ -6,7 +6,7 @@
 	
 	let { children, data }: { children: any, data: LayoutData } = $props();
 	
-	$: user = data?.user;
+	let user = $derived(data?.user);
 </script>
 
 <svelte:head>
