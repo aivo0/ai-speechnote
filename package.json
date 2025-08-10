@@ -66,6 +66,7 @@
 			"esbuild"
 		],
 		"ignoredBuiltDependencies": [
+			"@tailwindcss/oxide",
 			"sharp",
 			"workerd"
 		]

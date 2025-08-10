@@ -40,6 +40,9 @@
 	
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
 		<div class="text-center">
+			<div class="flex justify-center mb-8">
+				<img src="/favicon-128x128.png" alt="SpeechNote" class="w-24 h-24 sm:w-32 sm:h-32 drop-shadow-2xl" />
+			</div>
 			<h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white">
 				Speech Recognition That
 				<span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Respects Your Privacy</span>

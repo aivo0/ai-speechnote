@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import logoSvg from '$lib/assets/logo.svg';
 	import { page } from '$app/stores';
 	import type { LayoutData } from './$types';
 	
@@ -10,7 +10,12 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="128x128" href="/favicon-128x128.png" />
+	<link rel="apple-touch-icon" href="/favicon.png" />
+	<link rel="manifest" href="/manifest.json" />
+	<meta name="theme-color" content="#4f46e5" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
@@ -23,8 +28,8 @@
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex justify-between items-center h-16">
 				<div class="flex items-center">
-					<a href="/" class="flex items-center space-x-2">
-						<div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg"></div>
+					<a href="/" class="flex items-center space-x-3">
+						<img src={logoSvg} alt="SpeechNote Logo" class="w-9 h-9" />
 						<span class="font-semibold text-xl text-gray-900 dark:text-white">SpeechNote</span>
 					</a>
 				</div>
@@ -50,7 +55,7 @@
 				</div>
 				
 				<!-- Mobile menu button -->
-				<button class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+				<button class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Open mobile menu">
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
 					</svg>
