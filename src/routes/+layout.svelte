@@ -3,6 +3,8 @@
 	import logoSvg from '$lib/assets/logo.svg';
 	import { page } from '$app/stores';
 	import type { LayoutData } from './$types';
+	import * as m from '$lib/paraglide/messages';
+	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	
 	let { children, data }: { children: any, data: LayoutData } = $props();
 	
@@ -35,23 +37,25 @@
 				</div>
 				
 				<div class="hidden md:flex items-center space-x-8">
-					<a href="/#features" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">Features</a>
-					<a href="/#pricing" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">Pricing</a>
-					<a href="/help" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">Help</a>
+					<a href="/#features" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_features()}</a>
+					<a href="/#pricing" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_pricing()}</a>
+					<a href="/help" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_help()}</a>
 					
 					{#if user}
-						<a href="/dashboard" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">Dashboard</a>
+						<a href="/dashboard" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_dashboard()}</a>
 						<form method="POST" action="/auth/logout">
 							<button type="submit" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">
-								Sign Out
+								{m.nav_signout()}
 							</button>
 						</form>
 					{:else}
-						<a href="/auth/login" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">Sign In</a>
+						<a href="/auth/login" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_signin()}</a>
 						<a href="/auth/signup" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition">
-							Get Started
+							{m.nav_getstarted()}
 						</a>
 					{/if}
+					
+					<LanguageSwitcher />
 				</div>
 				
 				<!-- Mobile menu button -->
@@ -74,42 +78,42 @@
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 			<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
 				<div>
-					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">Product</h3>
+					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">{m.footer_product()}</h3>
 					<ul class="space-y-2">
-						<li><a href="/#features" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Features</a></li>
-						<li><a href="/#pricing" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Pricing</a></li>
-						<li><a href="/download" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Download</a></li>
+						<li><a href="/#features" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_features()}</a></li>
+						<li><a href="/#pricing" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_pricing()}</a></li>
+						<li><a href="/download" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_download()}</a></li>
 					</ul>
 				</div>
 				
 				<div>
-					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">Support</h3>
+					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">{m.footer_support()}</h3>
 					<ul class="space-y-2">
-						<li><a href="/help" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Help Center</a></li>
-						<li><a href="/contact" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Contact</a></li>
+						<li><a href="/help" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_help()}</a></li>
+						<li><a href="/contact" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_contact()}</a></li>
 					</ul>
 				</div>
 				
 				<div>
-					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">Legal</h3>
+					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">{m.footer_legal()}</h3>
 					<ul class="space-y-2">
-						<li><a href="/terms" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Terms</a></li>
-						<li><a href="/privacy" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Privacy</a></li>
+						<li><a href="/terms" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_terms()}</a></li>
+						<li><a href="/privacy" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_privacy()}</a></li>
 					</ul>
 				</div>
 				
 				<div>
-					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">Connect</h3>
+					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">{m.footer_connect()}</h3>
 					<ul class="space-y-2">
-						<li><a href="https://github.com" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">GitHub</a></li>
-						<li><a href="https://twitter.com" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Twitter</a></li>
+						<li><a href="https://github.com" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_github()}</a></li>
+						<li><a href="https://twitter.com" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_twitter()}</a></li>
 					</ul>
 				</div>
 			</div>
 			
 			<div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
 				<p class="text-center text-gray-600 dark:text-gray-400">
-					© 2025 SpeechNote. All rights reserved.
+					{m.footer_copyright()}
 				</p>
 			</div>
 		</div>
