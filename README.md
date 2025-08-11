@@ -13,7 +13,7 @@ Landing page and licensing system for SpeechNote - a privacy-focused speech reco
 
 ## Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - pnpm (`npm install -g pnpm`)
 - Cloudflare account
 - Wrangler CLI (`pnpm add -g wrangler`)
@@ -21,28 +21,33 @@ Landing page and licensing system for SpeechNote - a privacy-focused speech reco
 ## Getting Started
 
 1. **Clone the repository**
+
 ```bash
 git clone <repository-url>
 cd speechnote-web
 ```
 
 2. **Install dependencies**
+
 ```bash
 pnpm install
 ```
 
 3. **Set up environment variables**
+
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
 4. **Initialize local database**
+
 ```bash
 pnpm db:push
 ```
 
 5. **Start development server**
+
 ```bash
 pnpm dev
 ```
@@ -97,6 +102,7 @@ src/
 The project uses Cloudflare D1 in production and local SQLite for development.
 
 ### Apply migrations to Cloudflare D1:
+
 ```bash
 # Local D1 database
 pnpm wrangler d1 migrations apply speechnote-db --local
@@ -127,6 +133,7 @@ PUBLIC_BASE_URL=https://speechnote.app
 ## Deployment
 
 1. **Set Cloudflare secrets**
+
 ```bash
 pnpm wrangler secret put BETTER_AUTH_SECRET
 pnpm wrangler secret put GOOGLE_CLIENT_ID
@@ -134,11 +141,13 @@ pnpm wrangler secret put GOOGLE_CLIENT_ID
 ```
 
 2. **Apply database migrations**
+
 ```bash
 pnpm wrangler d1 migrations apply speechnote-db --remote
 ```
 
 3. **Deploy to Cloudflare Workers**
+
 ```bash
 pnpm deploy
 ```

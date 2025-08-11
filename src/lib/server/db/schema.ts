@@ -1,170 +1,242 @@
-import { sqliteTable, text, integer, real, blob } from 'drizzle-orm/sqlite-core';
-import { sql } from 'drizzle-orm';
+import {
+  sqliteTable,
+  text,
+  integer,
+  real,
+  blob,
+} from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
 // ============================================
 // BetterAuth Core Tables
 // ============================================
 
-export const user = sqliteTable('user', {
-	id: text('id').primaryKey(),
-	email: text('email').notNull().unique(),
-	emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
-	name: text('name'),
-	avatar: text('avatar'),
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const user = sqliteTable("user", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  emailVerified: integer("email_verified", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  name: text("name"),
+  avatar: text("avatar"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const session = sqliteTable('session', {
-	id: text('id').primaryKey(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-	token: text('token').notNull().unique(),
-	ipAddress: text('ip_address'),
-	userAgent: text('user_agent'),
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const session = sqliteTable("session", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  token: text("token").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const account = sqliteTable('account', {
-	id: text('id').primaryKey(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	accountId: text('account_id').notNull(),
-	providerId: text('provider_id').notNull(),
-	accessToken: text('access_token'),
-	refreshToken: text('refresh_token'),
-	expiresAt: integer('expires_at', { mode: 'timestamp' }),
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const account = sqliteTable("account", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  expiresAt: integer("expires_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const verification = sqliteTable('verification', {
-	id: text('id').primaryKey(),
-	identifier: text('identifier').notNull(),
-	value: text('value').notNull(),
-	expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const verification = sqliteTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
 // ============================================
 // Custom Application Tables
 // ============================================
 
-export const subscription = sqliteTable('subscription', {
-	id: text('id').primaryKey(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	plan: text('plan', { enum: ['trial', 'personal', 'professional', 'team'] }).notNull(),
-	status: text('status', { enum: ['active', 'cancelled', 'expired', 'pending'] }).notNull(),
-	stripeCustomerId: text('stripe_customer_id'),
-	stripeSubscriptionId: text('stripe_subscription_id'),
-	stripePriceId: text('stripe_price_id'),
-	quantity: integer('quantity').default(1),
-	startedAt: integer('started_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-	expiresAt: integer('expires_at', { mode: 'timestamp' }),
-	cancelledAt: integer('cancelled_at', { mode: 'timestamp' }),
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const subscription = sqliteTable("subscription", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  plan: text("plan", {
+    enum: ["trial", "personal", "professional", "team"],
+  }).notNull(),
+  status: text("status", {
+    enum: ["active", "cancelled", "expired", "pending"],
+  }).notNull(),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripePriceId: text("stripe_price_id"),
+  quantity: integer("quantity").default(1),
+  startedAt: integer("started_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  expiresAt: integer("expires_at", { mode: "timestamp" }),
+  cancelledAt: integer("cancelled_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const purchase = sqliteTable('purchase', {
-	id: text('id').primaryKey(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	productId: text('product_id').notNull(),
-	productName: text('product_name').notNull(),
-	amount: real('amount').notNull(),
-	currency: text('currency').notNull().default('USD'),
-	status: text('status', { enum: ['pending', 'completed', 'failed', 'refunded'] }).notNull(),
-	stripePaymentIntentId: text('stripe_payment_intent_id'),
-	licenseKey: text('license_key').unique(),
-	metadata: text('metadata'), // JSON string for additional data
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const purchase = sqliteTable("purchase", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  productId: text("product_id").notNull(),
+  productName: text("product_name").notNull(),
+  amount: real("amount").notNull(),
+  currency: text("currency").notNull().default("USD"),
+  status: text("status", {
+    enum: ["pending", "completed", "failed", "refunded"],
+  }).notNull(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  licenseKey: text("license_key").unique(),
+  metadata: text("metadata"), // JSON string for additional data
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const downloadToken = sqliteTable('download_token', {
-	id: text('id').primaryKey(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	purchaseId: text('purchase_id').references(() => purchase.id, { onDelete: 'cascade' }),
-	token: text('token').notNull().unique(),
-	platform: text('platform', { enum: ['windows', 'macos', 'linux'] }),
-	version: text('version'),
-	downloadCount: integer('download_count').notNull().default(0),
-	maxDownloads: integer('max_downloads').default(5),
-	expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-	lastDownloadAt: integer('last_download_at', { mode: 'timestamp' }),
-	ipAddress: text('ip_address'),
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const downloadToken = sqliteTable("download_token", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  purchaseId: text("purchase_id").references(() => purchase.id, {
+    onDelete: "cascade",
+  }),
+  token: text("token").notNull().unique(),
+  platform: text("platform", { enum: ["windows", "macos", "linux"] }),
+  version: text("version"),
+  downloadCount: integer("download_count").notNull().default(0),
+  maxDownloads: integer("max_downloads").default(5),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  lastDownloadAt: integer("last_download_at", { mode: "timestamp" }),
+  ipAddress: text("ip_address"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const waitlist = sqliteTable('waitlist', {
-	id: text('id').primaryKey(),
-	email: text('email').notNull().unique(),
-	name: text('name'),
-	company: text('company'),
-	useCase: text('use_case'),
-	source: text('source'), // Where they signed up from (homepage, blog, etc.)
-	referrer: text('referrer'), // Referral tracking
-	status: text('status', { enum: ['pending', 'invited', 'converted'] }).notNull().default('pending'),
-	invitedAt: integer('invited_at', { mode: 'timestamp' }),
-	convertedAt: integer('converted_at', { mode: 'timestamp' }),
-	metadata: text('metadata'), // JSON string for additional data
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const waitlist = sqliteTable("waitlist", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name"),
+  company: text("company"),
+  useCase: text("use_case"),
+  source: text("source"), // Where they signed up from (homepage, blog, etc.)
+  referrer: text("referrer"), // Referral tracking
+  status: text("status", { enum: ["pending", "invited", "converted"] })
+    .notNull()
+    .default("pending"),
+  invitedAt: integer("invited_at", { mode: "timestamp" }),
+  convertedAt: integer("converted_at", { mode: "timestamp" }),
+  metadata: text("metadata"), // JSON string for additional data
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const appVersion = sqliteTable('app_version', {
-	id: text('id').primaryKey(),
-	version: text('version').notNull().unique(),
-	platform: text('platform', { enum: ['windows', 'macos', 'linux'] }).notNull(),
-	releaseNotes: text('release_notes'),
-	downloadUrl: text('download_url').notNull(),
-	fileSize: integer('file_size'), // in bytes
-	checksum: text('checksum'), // SHA256 hash
-	isLatest: integer('is_latest', { mode: 'boolean' }).notNull().default(false),
-	isPrerelease: integer('is_prerelease', { mode: 'boolean' }).notNull().default(false),
-	minSystemVersion: text('min_system_version'),
-	releasedAt: integer('released_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const appVersion = sqliteTable("app_version", {
+  id: text("id").primaryKey(),
+  version: text("version").notNull().unique(),
+  platform: text("platform", { enum: ["windows", "macos", "linux"] }).notNull(),
+  releaseNotes: text("release_notes"),
+  downloadUrl: text("download_url").notNull(),
+  fileSize: integer("file_size"), // in bytes
+  checksum: text("checksum"), // SHA256 hash
+  isLatest: integer("is_latest", { mode: "boolean" }).notNull().default(false),
+  isPrerelease: integer("is_prerelease", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  minSystemVersion: text("min_system_version"),
+  releasedAt: integer("released_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const supportTicket = sqliteTable('support_ticket', {
-	id: text('id').primaryKey(),
-	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
-	email: text('email').notNull(),
-	name: text('name'),
-	subject: text('subject').notNull(),
-	message: text('message').notNull(),
-	category: text('category', { enum: ['bug', 'feature', 'billing', 'technical', 'other'] }),
-	status: text('status', { enum: ['open', 'in_progress', 'resolved', 'closed'] }).notNull().default('open'),
-	priority: text('priority', { enum: ['low', 'medium', 'high', 'urgent'] }).default('medium'),
-	response: text('response'),
-	respondedAt: integer('responded_at', { mode: 'timestamp' }),
-	resolvedAt: integer('resolved_at', { mode: 'timestamp' }),
-	metadata: text('metadata'), // JSON string for additional data
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const supportTicket = sqliteTable("support_ticket", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+  email: text("email").notNull(),
+  name: text("name"),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  category: text("category", {
+    enum: ["bug", "feature", "billing", "technical", "other"],
+  }),
+  status: text("status", {
+    enum: ["open", "in_progress", "resolved", "closed"],
+  })
+    .notNull()
+    .default("open"),
+  priority: text("priority", {
+    enum: ["low", "medium", "high", "urgent"],
+  }).default("medium"),
+  response: text("response"),
+  respondedAt: integer("responded_at", { mode: "timestamp" }),
+  resolvedAt: integer("resolved_at", { mode: "timestamp" }),
+  metadata: text("metadata"), // JSON string for additional data
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
-export const auditLog = sqliteTable('audit_log', {
-	id: text('id').primaryKey(),
-	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
-	action: text('action').notNull(), // login, logout, download, purchase, etc.
-	resourceType: text('resource_type'), // user, purchase, download, etc.
-	resourceId: text('resource_id'),
-	ipAddress: text('ip_address'),
-	userAgent: text('user_agent'),
-	metadata: text('metadata'), // JSON string for additional data
-	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+export const auditLog = sqliteTable("audit_log", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+  action: text("action").notNull(), // login, logout, download, purchase, etc.
+  resourceType: text("resource_type"), // user, purchase, download, etc.
+  resourceId: text("resource_id"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  metadata: text("metadata"), // JSON string for additional data
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
 
 // Export all tables as a schema object for Drizzle
 export const schema = {
-	user,
-	session,
-	account,
-	verification,
-	subscription,
-	purchase,
-	downloadToken,
-	waitlist,
-	appVersion,
-	supportTicket,
-	auditLog
+  user,
+  session,
+  account,
+  verification,
+  subscription,
+  purchase,
+  downloadToken,
+  waitlist,
+  appVersion,
+  supportTicket,
+  auditLog,
 };

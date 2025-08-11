@@ -19,12 +19,14 @@ SpeechNote Web is the landing page, authentication, and payment system for the S
 ## Essential Development Commands
 
 ### Development
+
 ```bash
 pnpm dev          # Start development server (http://localhost:5173)
 pnpm preview      # Build and preview with Cloudflare Workers
 ```
 
 ### Code Quality
+
 ```bash
 pnpm check        # Run type checking
 pnpm lint         # Check formatting and ESLint
@@ -32,13 +34,15 @@ pnpm format       # Format code with Prettier
 ```
 
 ### Testing
+
 ```bash
 pnpm test:unit    # Run Vitest unit tests
-pnpm test:e2e     # Run Playwright e2e tests  
+pnpm test:e2e     # Run Playwright e2e tests
 pnpm test         # Run all tests
 ```
 
 ### Database Management
+
 ```bash
 pnpm db:push      # Push schema changes to local database
 pnpm db:generate  # Generate database migrations
@@ -51,6 +55,7 @@ npx wrangler d1 migrations apply speechnote-db --remote
 ```
 
 ### Deployment
+
 ```bash
 pnpm build        # Build for production
 pnpm deploy       # Build and deploy to Cloudflare
@@ -60,6 +65,7 @@ npx wrangler types # Generate Cloudflare types
 ## Architecture Overview
 
 ### Technology Stack
+
 - **Framework**: SvelteKit 2 with Svelte 5
 - **Language**: TypeScript (strict mode)
 - **Styling**: TailwindCSS v4
@@ -71,6 +77,7 @@ npx wrangler types # Generate Cloudflare types
 - **i18n**: Inlang Paraglide (English + Estonian)
 
 ### Project Structure
+
 - `/src/routes/` - File-based routing (SvelteKit convention)
 - `/src/lib/server/db/` - Database schema and configuration
 - `/src/lib/server/auth.ts` - BetterAuth configuration
@@ -83,12 +90,14 @@ npx wrangler types # Generate Cloudflare types
 The database uses Drizzle ORM with SQLite/D1 and includes:
 
 **Authentication Tables** (BetterAuth):
+
 - `user` - User accounts with email verification
 - `session` - Active user sessions
 - `account` - OAuth provider accounts
 - `verification` - Email verification tokens
 
 **Application Tables**:
+
 - `subscription` - User subscription plans
 - `purchase` - One-time purchases and license keys
 - `downloadToken` - Secure download tokens with expiry
@@ -133,6 +142,7 @@ PUBLIC_BASE_URL=https://speechnote.app
 ### Cloudflare Configuration
 
 The project is configured for:
+
 - **Domain**: speechnote.app (custom domain in wrangler.jsonc)
 - **D1 Database**: speechnote-db
 - **R2 Bucket**: speechnote-downloads (for app installers)
@@ -150,17 +160,20 @@ The project is configured for:
 ### Common Tasks
 
 **Add a new database table**:
+
 1. Edit `src/lib/server/db/schema.ts`
 2. Run `pnpm db:generate` to create migration
 3. Run `pnpm db:push` for local development
 4. Run `npx wrangler d1 migrations apply speechnote-db --remote` for production
 
 **Test authentication locally**:
+
 1. Ensure `.env` has BETTER_AUTH_SECRET set
 2. Google OAuth requires valid client ID/secret
 3. Email OTP requires Mailgun configuration
 
 **Deploy to production**:
+
 1. Ensure all secrets are set in Cloudflare: `npx wrangler secret put SECRET_NAME`
 2. Run `pnpm deploy`
 3. Apply any pending migrations to remote D1
