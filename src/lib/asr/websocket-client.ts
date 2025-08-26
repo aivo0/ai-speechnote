@@ -97,15 +97,9 @@ export class EnhancedASRClient {
       return;
     }
     
-    try {
-      await this.initializeAudio();
-      this._state.update(state => ({ ...state, isRecording: true, isPaused: false, error: null }));
-      this.emitEvent('recording', { status: 'started', duration: 0 });
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Failed to start recording';
-      this._state.update(state => ({ ...state, error: errorMsg }));
-      throw error;
-    }
+    // Just update state and emit event - audio management is handled by AudioProcessor
+    this._state.update(state => ({ ...state, isRecording: true, isPaused: false, error: null }));
+    this.emitEvent('recording', { status: 'started', duration: 0 });
   }
   
   pauseRecording(): void {
@@ -163,6 +157,23 @@ export class EnhancedASRClient {
     }
     this.disconnect();
     this.eventListeners.clear();
+  }
+
+  // Send audio data to WebSocket server
+  sendAudioData(audioData: Float32Array): void {
+    const state = get(this._state);
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN || !state.isRecording || state.isPaused) {
+      return;
+    }
+
+    // Convert Float32Array to 16-bit PCM
+    const pcmData = new Int16Array(audioData.length);
+    for (let i = 0; i < audioData.length; i++) {
+      pcmData[i] = Math.max(-32768, Math.min(32767, Math.floor(audioData[i] * 32767)));
+    }
+
+    // Send as binary data
+    this.ws.send(pcmData.buffer);
   }
   
   // ============================================

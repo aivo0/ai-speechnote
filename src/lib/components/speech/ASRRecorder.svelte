@@ -199,23 +199,34 @@
     try {
       errorActions.clearAllErrors();
       
-      // Initialize audio if not already done
-      if (!state.isRecording) {
+      // Always ensure audio processor is properly initialized before starting
+      // This handles cases where it was stopped previously
+      try {
         await audioProcessor.initialize();
-        audioProcessor.onAudioData((data) => {
-          // Send to WebSocket - this would be handled by the enhanced client
-          console.log('Audio data received:', data.length);
-        });
+      } catch (initError) {
+        // If already initialized, that's fine - just continue
+        console.log('Audio processor already initialized:', initError.message);
       }
       
+      // Set up audio data callback
+      audioProcessor.onAudioData((data) => {
+        // Send to WebSocket client
+        asrClient.sendAudioData(data);
+        console.log('Audio data sent to WebSocket:', data.length);
+      });
+      
+      // Start audio processing first, then update WebSocket state
       await audioProcessor.start();
       await asrClient.startRecording();
       
       recordingStartTime = Date.now();
       startDurationTimer();
       
+      console.log('Recording started successfully');
+      
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Failed to start recording';
+      console.error('Start recording error:', errorMsg);
       errorActions.setError('audio', errorMsg);
       onError?.(errorMsg);
     }

@@ -20,6 +20,7 @@ export class AudioProcessor {
   };
   
   private isProcessing = false;
+  private isStarted = false;
   private metricsCallback: ((metrics: AudioMetrics) => void) | null = null;
   private dataCallback: ((data: Float32Array) => void) | null = null;
   
@@ -121,12 +122,18 @@ export class AudioProcessor {
       throw new Error('Audio processor not initialized');
     }
     
+    // If already started, just return (idempotent)
+    if (this.isStarted) {
+      return;
+    }
+    
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume();
     }
     
     // Send start message to processor
     this.processor.port.postMessage({ type: 'start' });
+    this.isStarted = true;
     
     // Start metrics collection if callback is set
     if (this.metricsCallback) {
@@ -135,10 +142,11 @@ export class AudioProcessor {
   }
   
   stop(): void {
-    if (this.processor) {
+    if (this.processor && this.isStarted) {
       this.processor.port.postMessage({ type: 'stop' });
     }
     
+    this.isStarted = false;
     this.stopMetricsCollection();
   }
   
@@ -177,6 +185,7 @@ export class AudioProcessor {
     }
     
     this.isProcessing = false;
+    this.isStarted = false;
     console.log('Audio processor cleanup completed');
   }
   
