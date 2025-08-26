@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SpeechNote Web is the landing page, authentication, and payment system for the SpeechNote desktop application (located in ../desktop-asr). Built with SvelteKit, it provides user registration, licensing, downloads, and documentation. Deployed to Cloudflare Workers with D1 database.
+AI SpeechNote Web is the landing page, authentication, and payment system for the AI SpeechNote desktop application (located in ../desktop-asr). Built with SvelteKit, it provides user registration, licensing, downloads, and documentation. Deployed to Cloudflare Workers with D1 database.
 
 ## Essential Development Commands
 
@@ -136,16 +136,16 @@ MAILGUN_API_KEY=
 MAILGUN_DOMAIN=
 TURNSTILE_SECRET_KEY=
 TURNSTILE_SITE_KEY=
-PUBLIC_BASE_URL=https://speechnote.app
+PUBLIC_BASE_URL=https://speechnote.ai
 ```
 
 ### Cloudflare Configuration
 
 The project is configured for:
 
-- **Domain**: speechnote.app (custom domain in wrangler.jsonc)
-- **D1 Database**: speechnote-db
-- **R2 Bucket**: speechnote-downloads (for app installers)
+- **Domain**: speechnote.ai (custom domain in wrangler.jsonc)
+- **D1 Database**: ai-speechnote-db
+- **R2 Bucket**: ai-speechnote-downloads (for app installers)
 - **Workers Compatibility**: nodejs_compat flag enabled
 
 ### Important Notes
@@ -164,7 +164,7 @@ The project is configured for:
 1. Edit `src/lib/server/db/schema.ts`
 2. Run `pnpm db:generate` to create migration
 3. Run `pnpm db:push` for local development
-4. Run `npx wrangler d1 migrations apply speechnote-db --remote` for production
+4. Run `npx wrangler d1 migrations apply ai-speechnote-db --remote` for production
 
 **Test authentication locally**:
 

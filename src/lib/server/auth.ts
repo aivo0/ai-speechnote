@@ -12,8 +12,8 @@ export function createAuth(db: Database, env: any) {
     trustedOrigins: [
       "http://localhost:5173",
       "http://localhost:4173",
-      "https://speechnote.app",
-      "https://www.speechnote.app",
+      "https://speechnote.ai",
+      "https://www.speechnote.ai",
     ],
     emailAndPassword: {
       enabled: true,

@@ -1,6 +1,6 @@
-# SpeechNote Web
+# AI SpeechNote Web
 
-Landing page and licensing system for SpeechNote - a privacy-focused speech recognition desktop application with Estonian and English language support.
+Landing page and licensing system for AI SpeechNote - a privacy-focused AI-powered speech recognition desktop application with Estonian and English language support.
 
 ## Tech Stack
 
@@ -23,8 +23,8 @@ Landing page and licensing system for SpeechNote - a privacy-focused speech reco
 1. **Clone the repository**
 
 ```bash
-git clone <repository-url>
-cd speechnote-web
+git clone https://github.com/aivo0/ai-speechnote
+cd ai-speechnote
 ```
 
 2. **Install dependencies**
@@ -105,10 +105,10 @@ The project uses Cloudflare D1 in production and local SQLite for development.
 
 ```bash
 # Local D1 database
-pnpm wrangler d1 migrations apply speechnote-db --local
+pnpm wrangler d1 migrations apply ai-speechnote-db --local
 
 # Production D1 database
-pnpm wrangler d1 migrations apply speechnote-db --remote
+pnpm wrangler d1 migrations apply ai-speechnote-db --remote
 ```
 
 ## Environment Variables
@@ -127,7 +127,7 @@ MAILGUN_API_KEY=
 MAILGUN_DOMAIN=
 TURNSTILE_SECRET_KEY=
 TURNSTILE_SITE_KEY=
-PUBLIC_BASE_URL=https://speechnote.app
+PUBLIC_BASE_URL=https://speechnote.ai
 ```
 
 ## Deployment
@@ -143,7 +143,7 @@ pnpm wrangler secret put GOOGLE_CLIENT_ID
 2. **Apply database migrations**
 
 ```bash
-pnpm wrangler d1 migrations apply speechnote-db --remote
+pnpm wrangler d1 migrations apply ai-speechnote-db --remote
 ```
 
 3. **Deploy to Cloudflare Workers**

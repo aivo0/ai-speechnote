@@ -4,7 +4,7 @@
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "speechnote-web",
+  "name": "ai-speechnote",
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2025-08-10",
   "compatibility_flags": ["nodejs_compat"],
@@ -18,25 +18,25 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "speechnote-db",
+      "database_name": "ai-speechnote-db",
       "database_id": "dc681269-114d-4b23-b3e1-4f33e233cf5b",
       "migrations_dir": "./src/lib/server/db/migrations",
     },
   ],
   "routes": [
     {
-      "pattern": "speechnote.app",
+      "pattern": "speechnote.ai",
       "custom_domain": true,
     },
     {
-      "pattern": "www.speechnote.app",
+      "pattern": "www.speechnote.ai",
       "custom_domain": true,
     },
   ],
   "r2_buckets": [
     {
       "binding": "DOWNLOADS",
-      "bucket_name": "speechnote-downloads",
+      "bucket_name": "ai-speechnote-downloads",
     },
   ],
   /**
