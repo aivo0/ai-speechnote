@@ -199,6 +199,9 @@
     try {
       errorActions.clearAllErrors();
       
+      // Clear any previous partial text to start fresh
+      asrState.update(s => ({ ...s, partialText: '' }));
+      
       // Always ensure audio processor is properly initialized before starting
       // This handles cases where it was stopped previously
       try {
@@ -250,6 +253,33 @@
     if (!asrClient || !audioProcessor) return;
     
     try {
+      // Finalize any partial text as a segment before stopping
+      const state = $asrState;
+      if (state.partialText && state.partialText.trim()) {
+        const segment: SpeechSegment = {
+          id: crypto.randomUUID(),
+          sessionId: currentSessionData?.id || '',
+          sequence: segments.length,
+          text: state.partialText.trim(),
+          partialText: null,
+          confidence: null,
+          duration: null,
+          language: language,
+          alternatives: null,
+          isEdited: false,
+          metadata: null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        
+        segmentActions.addSegment(segment);
+        await segmentActions.saveSegment(segment);
+        onSegmentCreated?.(segment);
+      }
+      
+      // Always clear partial text when stopping
+      asrState.update(s => ({ ...s, partialText: '' }));
+      
       await asrClient.stopRecording();
       audioProcessor.stop(); // Only stop, don't cleanup - preserve media stream
       
@@ -299,7 +329,7 @@
   // Cleanup
   async function cleanup() {
     stopDurationTimer();
-    await asrClient?.destroy();
+    await asrClient?.closeConnection();
     audioProcessor?.cleanup();
   }
   

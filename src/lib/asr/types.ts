@@ -16,6 +16,14 @@ export interface EndMessage extends WSMessage {
   event: "end";
 }
 
+export interface FlushMessage extends WSMessage {
+  event: "flush";
+}
+
+export interface ResetMessage extends WSMessage {
+  event: "reset";
+}
+
 export interface ASRResult {
   text?: string;
   is_final: boolean;

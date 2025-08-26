@@ -19,14 +19,10 @@
   // For testing - provide dummy metrics when none available
   let displayMetrics = $derived(
     metrics || (isActive ? {
-      level: 0.3 + 0.2 * Math.sin(Date.now() / 200),
-      peakLevel: 0.8,
+      level: 0.2 + 0.15 * Math.sin(Date.now() / 300) + 0.05 * Math.random(),
+      peakLevel: 0.6 + 0.2 * Math.sin(Date.now() / 500),
       isClipping: false,
-      signalQuality: 'good' as const,
-      rms: 0.3,
-      snr: 20,
-      spectralCentroid: 1000,
-      spectralRolloff: 5000
+      signalQuality: 'good' as const
     } : null)
   );
   
@@ -35,7 +31,7 @@
   
   // Audio level history for visualization
   let levelHistory: number[] = [];
-  const maxHistoryLength = 100;
+  const maxHistoryLength = 80;
   
   onMount(() => {
     if (canvas) {
@@ -102,28 +98,14 @@
     ctx.fillStyle = isDarkMode() ? '#1f2937' : '#f8fafc';
     ctx.fillRect(0, 0, width, height);
     
-    // Draw some static bars to show it's a visualizer
-    const barCount = 20;
-    const barWidth = (width - 40) / barCount;
-    const barSpacing = barWidth * 0.2;
-    const maxBarHeight = height * 0.6;
-    
-    ctx.fillStyle = isDarkMode() ? '#374151' : '#e2e8f0';
-    
-    for (let i = 0; i < barCount; i++) {
-      const x = 20 + i * barWidth;
-      const barHeight = maxBarHeight * (0.2 + 0.3 * Math.sin(i * 0.5));
-      const y = (height - barHeight) / 2;
-      
-      ctx.fillRect(x, y, barWidth - barSpacing, barHeight);
-    }
-    
-    // Center text
-    ctx.fillStyle = isDarkMode() ? '#9ca3af' : '#64748b';
-    ctx.font = '12px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Audio visualizer (inactive)', width / 2, height / 2);
+    // Draw a simple flat line in the center when inactive
+    const centerY = height / 2;
+    ctx.strokeStyle = isDarkMode() ? '#374151' : '#e2e8f0';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(10, centerY);
+    ctx.lineTo(width - 10, centerY);
+    ctx.stroke();
   }
   
   function drawActiveVisualization(ctx: CanvasRenderingContext2D, width: number, height: number) {
@@ -156,7 +138,7 @@
   
   function drawWaveform(ctx: CanvasRenderingContext2D, width: number, height: number) {
     const centerY = height / 2;
-    const maxAmplitude = height * 0.4;
+    const maxAmplitude = height * 0.35;
     
     // Calculate step size based on available width and history length
     const stepSize = width / Math.max(levelHistory.length - 1, 1);
@@ -168,7 +150,9 @@
     
     levelHistory.forEach((level, index) => {
       const x = index * stepSize;
-      const y = centerY + (level - 0.5) * maxAmplitude * 2;
+      // Normalize level (0-1) to waveform amplitude (-1 to 1 around center)
+      const amplitude = (level - 0.3) * 2; // Center around 0.3, scale by 2
+      const y = centerY - (amplitude * maxAmplitude);
       
       if (index === 0) {
         ctx.moveTo(x, y);
@@ -180,14 +164,15 @@
     ctx.stroke();
     
     // Draw filled area under the line
-    ctx.globalAlpha = 0.3;
+    ctx.globalAlpha = 0.2;
     ctx.fillStyle = getWaveformColor();
     ctx.beginPath();
     ctx.moveTo(0, centerY);
     
     levelHistory.forEach((level, index) => {
       const x = index * stepSize;
-      const y = centerY + (level - 0.5) * maxAmplitude * 2;
+      const amplitude = (level - 0.3) * 2;
+      const y = centerY - (amplitude * maxAmplitude);
       ctx.lineTo(x, y);
     });
     

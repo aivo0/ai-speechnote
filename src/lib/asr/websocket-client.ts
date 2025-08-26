@@ -5,6 +5,8 @@ import type {
   ASRResult,
   ConfigMessage,
   EndMessage,
+  FlushMessage,
+  ResetMessage,
   ConnectionEvent,
   RecordingEvent,
   TranscriptionEvent,
@@ -97,8 +99,21 @@ export class EnhancedASRClient {
       return;
     }
     
-    // Just update state and emit event - audio management is handled by AudioProcessor
-    this._state.update(state => ({ ...state, isRecording: true, isPaused: false, error: null }));
+    // Clear partial text and update state for fresh start
+    this._state.update(state => ({ 
+      ...state, 
+      isRecording: true, 
+      isPaused: false, 
+      error: null,
+      partialText: ''
+    }));
+    
+    // Send start signal to create new stream on server
+    this.sendStartSignal();
+    
+    // Send fresh config for new recording session
+    this.sendConfig();
+    
     this.emitEvent('recording', { status: 'started', duration: 0 });
   }
   
@@ -128,18 +143,21 @@ export class EnhancedASRClient {
     
     this._state.update(s => ({ ...s, isRecording: false, isPaused: false }));
     
-    // Flush remaining audio but don't send end signal to keep connection alive
+    // Flush remaining audio queue first
     await this.flushAudioQueue();
     
-    // Note: Keep WebSocket connection alive for quick restart
-    // Only send end signal on explicit disconnect() or destroy()
+    // Send flush signal to process remaining audio and get final results
+    this.sendFlushSignal();
+    
+    // Note: WebSocket connection stays alive, server processes remaining audio
+    // Final transcription will be received via flush_complete event
     
     this.emitEvent('recording', { status: 'stopped', duration: this.getRecordingDuration() });
   }
   
   disconnect(): void {
-    // Send end signal before closing connection
-    this.sendEndSignal();
+    // Send close signal before closing connection
+    this.sendCloseSignal();
     this.cleanupConnection();
     this._state.update(state => ({
       ...state,
@@ -148,6 +166,14 @@ export class EnhancedASRClient {
       isPaused: false,
       connectionQuality: "disconnected"
     }));
+  }
+  
+  async closeConnection(): Promise<void> {
+    // Method specifically for component cleanup
+    if (get(this._state).isRecording) {
+      await this.stopRecording();
+    }
+    this.disconnect();
   }
   
   async destroy(): Promise<void> {
@@ -414,6 +440,49 @@ export class EnhancedASRClient {
         return;
       }
       
+      // Handle stream_started response
+      if ('event' in result && result.event === 'stream_started') {
+        console.log('Stream started successfully on server');
+        return;
+      }
+      
+      // Handle flushing response
+      if ('event' in result && result.event === 'flushing') {
+        console.log('Server is flushing remaining audio');
+        return;
+      }
+      
+      // Handle flush_complete response
+      if ('event' in result && result.event === 'flush_complete') {
+        console.log('Flush complete, clearing partial text');
+        this._state.update(state => ({ ...state, partialText: '' }));
+        
+        // Handle final transcription from flush
+        if (result.alternatives && result.alternatives.length > 0) {
+          const text = result.alternatives[0].text;
+          if (text) {
+            this.emitEvent('transcription', {
+              type: 'transcription',
+              timestamp: new Date(),
+              data: {
+                segmentId: this.generateSegmentId(),
+                text,
+                isFinal: true,
+                confidence: result.alternatives[0].confidence,
+                alternatives: result.alternatives
+              }
+            });
+          }
+        }
+        return;
+      }
+      
+      // Handle connection_closed response
+      if ('event' in result && result.event === 'connection_closed') {
+        console.log('Server acknowledged connection close');
+        return;
+      }
+      
       // Handle error
       if (result.error) {
         console.error('Server error:', result.error);
@@ -424,32 +493,46 @@ export class EnhancedASRClient {
       
       // Handle transcription results
       if (result.is_final) {
-        // Final result
-        const text = result.alternatives && result.alternatives.length > 0
-          ? result.alternatives[0].text
-          : '';
-        
-        this._state.update(state => ({ ...state, partialText: '' }));
-        
-        this.emitEvent('transcription', {
-          segmentId: this.generateSegmentId(),
-          text,
-          isFinal: true,
-          confidence: result.alternatives?.[0]?.confidence,
-          alternatives: result.alternatives
-        });
+        // Final result - only process if we're currently recording
+        const currentState = get(this._state);
+        if (currentState.isRecording) {
+          const text = result.alternatives && result.alternatives.length > 0
+            ? result.alternatives[0].text
+            : '';
+          
+          this._state.update(state => ({ ...state, partialText: '' }));
+          
+          this.emitEvent('transcription', {
+            type: 'transcription',
+            timestamp: new Date(),
+            data: {
+              segmentId: this.generateSegmentId(),
+              text,
+              isFinal: true,
+              confidence: result.alternatives?.[0]?.confidence,
+              alternatives: result.alternatives
+            }
+          });
+        }
       } else {
-        // Partial result
-        this._state.update(state => ({
-          ...state,
-          partialText: result.text || ''
-        }));
-        
-        this.emitEvent('transcription', {
-          segmentId: this.generateSegmentId(),
-          text: result.text || '',
-          isFinal: false
-        });
+        // Partial result - only update if we're currently recording
+        const currentState = get(this._state);
+        if (currentState.isRecording) {
+          this._state.update(state => ({
+            ...state,
+            partialText: result.text || ''
+          }));
+          
+          this.emitEvent('transcription', {
+            type: 'transcription',
+            timestamp: new Date(),
+            data: {
+              segmentId: this.generateSegmentId(),
+              text: result.text || '',
+              isFinal: false
+            }
+          });
+        }
       }
     } catch (error) {
       console.error('Error parsing message:', error);
@@ -466,6 +549,10 @@ export class EnhancedASRClient {
     else if (latency > 500) quality = "good";
     
     this._state.update(state => ({ ...state, connectionQuality: quality }));
+  }
+
+  private generateSegmentId(): string {
+    return `segment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
   
   // ============================================
@@ -615,20 +702,44 @@ export class EnhancedASRClient {
     }
   }
   
+  private sendStartSignal(): void {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      const startMsg = { event: 'start' };
+      this.ws.send(JSON.stringify(startMsg));
+    }
+  }
+
   private sendEndSignal(): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       const endMsg: EndMessage = { event: 'end' };
       this.ws.send(JSON.stringify(endMsg));
     }
   }
+
+  private sendFlushSignal(): void {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      const flushMsg: FlushMessage = { event: 'flush' };
+      this.ws.send(JSON.stringify(flushMsg));
+    }
+  }
+
+  private sendCloseSignal(): void {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      const closeMsg = { event: 'close' };
+      this.ws.send(JSON.stringify(closeMsg));
+    }
+  }
+
+  private sendResetSignal(): void {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      const resetMsg: ResetMessage = { event: 'reset' };
+      this.ws.send(JSON.stringify(resetMsg));
+    }
+  }
   
   // ============================================
   // Utility Methods
   // ============================================
-  
-  private generateSegmentId(): string {
-    return `segment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
   
   private getRecordingDuration(): number {
     // This would need to be tracked properly in a real implementation
