@@ -7,73 +7,14 @@ import {
 import { sql } from "drizzle-orm";
 
 // ============================================
-// BetterAuth Core Tables
-// ============================================
-
-export const user = sqliteTable("user", {
-  id: text("id").primaryKey(),
-  email: text("email").notNull().unique(),
-  emailVerified: integer("email_verified", { mode: "boolean" })
-    .notNull()
-    .default(false),
-  name: text("name"),
-  avatar: text("avatar"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-});
-
-export const session = sqliteTable("session", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
-  token: text("token").notNull().unique(),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-});
-
-export const account = sqliteTable("account", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  accountId: text("account_id").notNull(),
-  providerId: text("provider_id").notNull(),
-  accessToken: text("access_token"),
-  refreshToken: text("refresh_token"),
-  expiresAt: integer("expires_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-});
-
-export const verification = sqliteTable("verification", {
-  id: text("id").primaryKey(),
-  identifier: text("identifier").notNull(),
-  value: text("value").notNull(),
-  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-});
-
-// ============================================
-// Custom Application Tables
+// Application Tables
+// Note: Auth tables are now in auth-schema.ts
+// User references are just string IDs, no foreign key constraints
 // ============================================
 
 export const subscription = sqliteTable("subscription", {
   id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Auth DB user ID reference
   plan: text("plan", {
     enum: ["trial", "personal", "professional", "team"],
   }).notNull(),
@@ -99,9 +40,7 @@ export const subscription = sqliteTable("subscription", {
 
 export const purchase = sqliteTable("purchase", {
   id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Auth DB user ID reference
   productId: text("product_id").notNull(),
   productName: text("product_name").notNull(),
   amount: real("amount").notNull(),
@@ -122,9 +61,7 @@ export const purchase = sqliteTable("purchase", {
 
 export const downloadToken = sqliteTable("download_token", {
   id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Auth DB user ID reference
   purchaseId: text("purchase_id").references(() => purchase.id, {
     onDelete: "cascade",
   }),
@@ -183,7 +120,7 @@ export const appVersion = sqliteTable("app_version", {
 
 export const supportTicket = sqliteTable("support_ticket", {
   id: text("id").primaryKey(),
-  userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+  userId: text("user_id"), // Optional Auth DB user ID reference
   email: text("email").notNull(),
   name: text("name"),
   subject: text("subject").notNull(),
@@ -213,7 +150,7 @@ export const supportTicket = sqliteTable("support_ticket", {
 
 export const auditLog = sqliteTable("audit_log", {
   id: text("id").primaryKey(),
-  userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+  userId: text("user_id"), // Optional Auth DB user ID reference
   action: text("action").notNull(), // login, logout, download, purchase, etc.
   resourceType: text("resource_type"), // user, purchase, download, etc.
   resourceId: text("resource_id"),
@@ -231,9 +168,7 @@ export const auditLog = sqliteTable("audit_log", {
 
 export const speechSession = sqliteTable("speech_session", {
   id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Auth DB user ID reference
   title: text("title"),
   language: text("language").default("et"), // Language code (et, en, etc.)
   status: text("status", {
@@ -277,10 +212,7 @@ export const speechSegment = sqliteTable("speech_segment", {
 
 export const speechSettings = sqliteTable("speech_settings", {
   id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .unique()
-    .references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().unique(), // Auth DB user ID reference
   defaultLanguage: text("default_language").default("et"),
   wsUrl: text("ws_url").default("wss://tekstiks.ee/asr/ws/asr"),
   nBest: integer("n_best").default(1), // Number of alternatives to request
@@ -300,12 +232,9 @@ export const speechSettings = sqliteTable("speech_settings", {
     .default(sql`(unixepoch())`),
 });
 
-// Export all tables as a schema object for Drizzle
+// Export all application tables as a schema object for Drizzle
+// Note: Auth tables are exported from auth-schema.ts
 export const schema = {
-  user,
-  session,
-  account,
-  verification,
   subscription,
   purchase,
   downloadToken,

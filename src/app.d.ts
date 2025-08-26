@@ -1,7 +1,7 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 
-import type { Database } from "$lib/server/db";
+import type { Database, AuthDatabase } from "$lib/server/db";
 import type { Auth, Session, User } from "better-auth";
 
 declare global {
@@ -9,6 +9,7 @@ declare global {
     interface Platform {
       env: {
         DB: D1Database;
+        AUTH_DB: D1Database;
         DOWNLOADS: R2Bucket;
         BETTER_AUTH_SECRET: string;
         GOOGLE_CLIENT_ID?: string;
@@ -28,6 +29,7 @@ declare global {
 
     interface Locals {
       db: Database;
+      authDb: AuthDatabase;
       auth: ReturnType<typeof import("$lib/server/auth").createAuth>;
       session: Session | null;
       user: User | null;

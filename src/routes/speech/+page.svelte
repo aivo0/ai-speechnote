@@ -271,7 +271,7 @@
           <ASRRecorder
             sessionId={session?.id}
             language="et"
-            wsUrl="wss://tekstiks.ee/asr/ws/asr"
+            wsUrl="ws://localhost:8000/ws/asr"
           />
         </div>
       </div>

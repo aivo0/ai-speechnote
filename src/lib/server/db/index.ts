@@ -3,9 +3,19 @@ import { drizzle as drizzleLibSQL, LibSQLDatabase } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import * as schema from "./schema";
 
+// Main application database type (no auth tables)
 export type Database =
   | DrizzleD1Database<typeof schema>
   | LibSQLDatabase<typeof schema>;
+
+// Re-export auth database types and functions
+export type { AuthDatabase } from "./auth-index";
+export { 
+  createAuthDatabaseClient, 
+  getAuthDb, 
+  authDb, 
+  authSchema 
+} from "./auth-index";
 
 /**
  * Create a LibSQL client for local development
@@ -25,7 +35,7 @@ export function createD1Client(
 }
 
 /**
- * Create a database client based on the environment
+ * Create a main application database client based on the environment
  */
 export function createDatabaseClient(env: {
   DB?: D1Database;

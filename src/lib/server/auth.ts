@@ -1,10 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import type { Database } from "$lib/server/db";
+import type { AuthDatabase } from "$lib/server/db";
 
-export function createAuth(db: Database, env: any) {
+export function createAuth(authDb: AuthDatabase, env: any) {
   return betterAuth({
-    database: drizzleAdapter(db, {
+    database: drizzleAdapter(authDb, {
       provider: "sqlite",
     }),
     secret: env.BETTER_AUTH_SECRET,

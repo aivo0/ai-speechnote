@@ -22,6 +22,12 @@
       "database_id": "e6e9a8f1-fd53-4164-9daa-2211e1b527c0",
       "migrations_dir": "./src/lib/server/db/migrations",
     },
+    {
+      "binding": "AUTH_DB",
+      "database_name": "ai-speechnote-auth-db",
+      "database_id": "5c9c7f7a-9311-4e55-8f43-3144bfb27c47",
+      "migrations_dir": "./src/lib/server/db/auth-migrations",
+    },
   ],
   "routes": [
     {

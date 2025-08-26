@@ -19,7 +19,7 @@
   let { 
     sessionId = undefined,
     language = 'et',
-    wsUrl = 'wss://tekstiks.ee/asr/ws/asr',
+    wsUrl = 'ws://localhost:8000/ws/asr',
     onSegmentCreated = undefined,
     onSessionUpdated = undefined,
     onError = undefined 
