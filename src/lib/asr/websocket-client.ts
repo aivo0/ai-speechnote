@@ -134,17 +134,18 @@ export class EnhancedASRClient {
     
     this._state.update(s => ({ ...s, isRecording: false, isPaused: false }));
     
-    // Flush remaining audio and send end signal
+    // Flush remaining audio but don't send end signal to keep connection alive
     await this.flushAudioQueue();
-    this.sendEndSignal();
     
-    // Note: Keep media stream, audio context, and processor alive for quick restart
-    // These will only be cleaned up on disconnect() or destroy()
+    // Note: Keep WebSocket connection alive for quick restart
+    // Only send end signal on explicit disconnect() or destroy()
     
     this.emitEvent('recording', { status: 'stopped', duration: this.getRecordingDuration() });
   }
   
   disconnect(): void {
+    // Send end signal before closing connection
+    this.sendEndSignal();
     this.cleanupConnection();
     this._state.update(state => ({
       ...state,
@@ -267,7 +268,10 @@ export class EnhancedASRClient {
           this._state.update(state => ({
             ...state,
             isConnected: false,
-            connectionQuality: "disconnected"
+            isRecording: false,
+            isPaused: false,
+            connectionQuality: "disconnected",
+            error: event.code !== 1000 ? `Connection closed unexpectedly (code: ${event.code})` : null
           }));
           
           this.emitEvent('connection', { status: 'disconnected' });
@@ -283,6 +287,9 @@ export class EnhancedASRClient {
           const errorMsg = 'WebSocket connection error';
           this._state.update(state => ({
             ...state,
+            isConnected: false,
+            isRecording: false,
+            isPaused: false,
             error: errorMsg,
             connectionQuality: "disconnected"
           }));

@@ -94,6 +94,18 @@
   // Event handlers
   function handleConnectionEvent(event: any) {
     console.log('Connection event:', event);
+    
+    if (event.data?.status === 'connected') {
+      // Clear any previous connection errors when successfully connected
+      errorActions.clearError('connection');
+      errorActions.clearError('general');
+    } else if (event.data?.status === 'disconnected') {
+      // Handle unexpected disconnection
+      console.log('WebSocket disconnected - connection will need to be re-established');
+    } else if (event.data?.status === 'error') {
+      // Handle connection errors
+      errorActions.setError('connection', 'WebSocket connection failed');
+    }
   }
   
   function handleTranscriptionEvent(event: any) {
@@ -164,7 +176,8 @@
     
     try {
       isConnecting = true;
-      errorActions.clearError('connection');
+      // Clear all previous errors when attempting new connection
+      errorActions.clearAllErrors();
       
       console.log('Attempting to connect to WebSocket...');
       await asrClient.connect();
