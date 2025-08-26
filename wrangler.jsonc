@@ -19,7 +19,7 @@
     {
       "binding": "DB",
       "database_name": "ai-speechnote-db",
-      "database_id": "dc681269-114d-4b23-b3e1-4f33e233cf5b",
+      "database_id": "e6e9a8f1-fd53-4164-9daa-2211e1b527c0",
       "migrations_dir": "./src/lib/server/db/migrations",
     },
   ],
