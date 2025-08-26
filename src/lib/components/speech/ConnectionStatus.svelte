@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { ConnectionStatusProps, ASRClientState } from '$lib/asr/types';
   
-  let { state, showDetails = false }: ConnectionStatusProps = $props();
+  let { state, showDetails = false, isConnecting = false }: ConnectionStatusProps = $props();
   
   // Get status color and icon based on connection state
-  function getStatusColor(state: ASRClientState) {
+  function getStatusColor(state: ASRClientState, isConnecting: boolean) {
+    if (isConnecting) return 'text-blue-500 bg-blue-100 dark:bg-blue-900/20';
     if (!state.isConnected) return 'text-red-500 bg-red-100 dark:bg-red-900/20';
     
     switch (state.connectionQuality) {
@@ -15,7 +16,13 @@
     }
   }
   
-  function getStatusIcon(state: ASRClientState) {
+  function getStatusIcon(state: ASRClientState, isConnecting: boolean) {
+    if (isConnecting) {
+      return `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>`;
+    }
     if (!state.isConnected) {
       return `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -42,7 +49,8 @@
     }
   }
   
-  function getStatusText(state: ASRClientState) {
+  function getStatusText(state: ASRClientState, isConnecting: boolean) {
+    if (isConnecting) return 'Connecting...';
     if (!state.isConnected) return 'Disconnected';
     
     switch (state.connectionQuality) {
@@ -53,10 +61,12 @@
     }
   }
   
-  function getDetailedStatus(state: ASRClientState) {
+  function getDetailedStatus(state: ASRClientState, isConnecting: boolean) {
     const parts = [];
     
-    if (state.isConnected) {
+    if (isConnecting) {
+      parts.push('Connecting to server...');
+    } else if (state.isConnected) {
       parts.push('Connected');
       if (state.isRecording) {
         parts.push(state.isPaused ? 'Paused' : 'Recording');
@@ -72,10 +82,10 @@
     return parts.join(' • ');
   }
   
-  let statusColor = $derived(getStatusColor(state));
-  let statusIcon = $derived(getStatusIcon(state));
-  let statusText = $derived(getStatusText(state));
-  let detailedStatus = $derived(getDetailedStatus(state));
+  let statusColor = $derived(getStatusColor(state, isConnecting));
+  let statusIcon = $derived(getStatusIcon(state, isConnecting));
+  let statusText = $derived(getStatusText(state, isConnecting));
+  let detailedStatus = $derived(getDetailedStatus(state, isConnecting));
 </script>
 
 <div class="connection-status flex items-center gap-3">

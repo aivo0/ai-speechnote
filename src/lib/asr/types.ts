@@ -127,6 +127,7 @@ export interface TranscriptSegmentProps {
 export interface ConnectionStatusProps {
   state: ASRClientState;
   showDetails?: boolean;
+  isConnecting?: boolean;
 }
 
 // ============================================

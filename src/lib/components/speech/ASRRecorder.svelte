@@ -31,6 +31,7 @@
   let recordingStartTime: number | null = null;
   let recordingDuration = $state(0);
   let durationTimer: number | null = null;
+  let isConnecting = $state(false);
   
   // Reactive state from stores - use derived to avoid infinite loops
   let state = $derived($asrState);
@@ -159,15 +160,23 @@
   
   // Control functions
   async function connect() {
-    if (!asrClient) return;
+    if (!asrClient || isConnecting) return;
     
     try {
+      isConnecting = true;
       errorActions.clearError('connection');
+      
+      console.log('Attempting to connect to WebSocket...');
       await asrClient.connect();
+      console.log('WebSocket connection established');
+      
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Connection failed';
+      console.error('Connection failed:', errorMsg);
       errorActions.setError('connection', errorMsg);
       onError?.(errorMsg);
+    } finally {
+      isConnecting = false;
     }
   }
   
@@ -278,7 +287,7 @@
   }
   
   // Reactive getters
-  let canConnect = $derived(!state.isConnected && !state.isRecording);
+  let canConnect = $derived(!state.isConnected && !state.isRecording && !isConnecting);
   let canRecord = $derived(state.isConnected && !state.isRecording && currentSessionData !== null);
   let canPause = $derived(state.isRecording && !state.isPaused);
   let canResume = $derived(state.isRecording && state.isPaused);
@@ -297,7 +306,7 @@
       {/if}
     </div>
     
-    <ConnectionStatus {state} showDetails={true} />
+    <ConnectionStatus {state} {isConnecting} showDetails={true} />
   </div>
   
   <!-- Audio Visualizer -->
@@ -337,10 +346,20 @@
         disabled={!canConnect}
         class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-        Connect
+        {#if isConnecting}
+          <!-- Loading spinner -->
+          <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Connecting...
+        {:else}
+          <!-- Connect icon -->
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Connect
+        {/if}
       </button>
     {/if}
     
