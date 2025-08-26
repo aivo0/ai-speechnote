@@ -44,5 +44,19 @@ export function createDatabaseClient(env: {
   }
 }
 
+// Default database instance for development
+let defaultDb: Database | null = null;
+
+export function getDb(): Database {
+  if (!defaultDb) {
+    const DATABASE_URL = process.env.DATABASE_URL || 'file:./local.db';
+    defaultDb = createLibSqlClient(DATABASE_URL);
+  }
+  return defaultDb;
+}
+
+// Export a default db instance
+export const db = getDb();
+
 export { schema };
 export * from "./schema";

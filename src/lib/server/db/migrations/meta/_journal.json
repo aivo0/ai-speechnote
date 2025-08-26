@@ -8,6 +8,13 @@
       "when": 1754828281221,
       "tag": "0000_violet_kate_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1756221867159,
+      "tag": "0001_fine_whizzer",
+      "breakpoints": true
     }
   ]
 }

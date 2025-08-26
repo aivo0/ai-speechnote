@@ -42,6 +42,12 @@
 					<a href="/help" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_help()}</a>
 					
 					{#if user}
+						<a href="/speech" class="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition font-medium">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+							</svg>
+							Speech
+						</a>
 						<a href="/dashboard" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_dashboard()}</a>
 						<form method="POST" action="/auth/logout">
 							<button type="submit" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">

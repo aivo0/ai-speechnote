@@ -3,7 +3,6 @@ import {
   text,
   integer,
   real,
-  blob,
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
@@ -226,6 +225,81 @@ export const auditLog = sqliteTable("audit_log", {
     .default(sql`(unixepoch())`),
 });
 
+// ============================================
+// Speech Recognition Tables
+// ============================================
+
+export const speechSession = sqliteTable("speech_session", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title"),
+  language: text("language").default("et"), // Language code (et, en, etc.)
+  status: text("status", {
+    enum: ["active", "paused", "completed", "archived"],
+  })
+    .notNull()
+    .default("active"),
+  totalDuration: integer("total_duration").default(0), // Total recording duration in seconds
+  segmentCount: integer("segment_count").default(0), // Number of transcript segments
+  wsUrl: text("ws_url"), // WebSocket URL used for this session
+  metadata: text("metadata"), // JSON string for session settings and additional data
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+export const speechSegment = sqliteTable("speech_segment", {
+  id: text("id").primaryKey(),
+  sessionId: text("session_id")
+    .notNull()
+    .references(() => speechSession.id, { onDelete: "cascade" }),
+  sequence: integer("sequence").notNull(), // Order of segment within session
+  text: text("text").notNull(), // Final transcribed text
+  partialText: text("partial_text"), // Last partial text before finalization
+  confidence: real("confidence"), // Confidence score (0-1)
+  duration: real("duration"), // Duration of this segment in seconds
+  language: text("language"), // Detected or specified language
+  alternatives: text("alternatives"), // JSON array of alternative transcriptions
+  isEdited: integer("is_edited", { mode: "boolean" }).notNull().default(false), // User manually edited
+  metadata: text("metadata"), // JSON string for additional data (timestamps, etc.)
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+export const speechSettings = sqliteTable("speech_settings", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  defaultLanguage: text("default_language").default("et"),
+  wsUrl: text("ws_url").default("wss://tekstiks.ee/asr/ws/asr"),
+  nBest: integer("n_best").default(1), // Number of alternatives to request
+  autoSave: integer("auto_save", { mode: "boolean" }).notNull().default(true),
+  autoExport: integer("auto_export", { mode: "boolean" }).notNull().default(false),
+  exportFormat: text("export_format", {
+    enum: ["txt", "json", "csv", "docx"],
+  }).default("txt"),
+  bufferSize: integer("buffer_size").default(1024), // Audio buffer size
+  maxSegmentLength: integer("max_segment_length").default(300), // Max segment length in seconds
+  metadata: text("metadata"), // JSON string for additional settings
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
 // Export all tables as a schema object for Drizzle
 export const schema = {
   user,
@@ -239,4 +313,7 @@ export const schema = {
   appVersion,
   supportTicket,
   auditLog,
+  speechSession,
+  speechSegment,
+  speechSettings,
 };
