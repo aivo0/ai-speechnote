@@ -153,14 +153,6 @@
     </div>
   {/if}
   
-  <!-- WebSocket URL (only in detailed view) -->
-  {#if showDetails && state.wsUrl}
-    <div class="hidden md:block">
-      <div class="text-xs text-gray-500 dark:text-gray-400 font-mono">
-        {state.wsUrl.replace('wss://', '').replace('ws://', '')}
-      </div>
-    </div>
-  {/if}
 </div>
 
 <style>
