@@ -134,27 +134,12 @@ export class EnhancedASRClient {
     
     this._state.update(s => ({ ...s, isRecording: false, isPaused: false }));
     
-    // Stop media stream
-    if (this.mediaStream) {
-      this.mediaStream.getTracks().forEach(track => track.stop());
-      this.mediaStream = null;
-    }
-    
-    // Disconnect audio processing
-    if (this.processor) {
-      this.processor.disconnect();
-      this.processor = null;
-    }
-    
-    // Close audio context
-    if (this.audioContext) {
-      await this.audioContext.close();
-      this.audioContext = null;
-    }
-    
     // Flush remaining audio and send end signal
     await this.flushAudioQueue();
     this.sendEndSignal();
+    
+    // Note: Keep media stream, audio context, and processor alive for quick restart
+    // These will only be cleaned up on disconnect() or destroy()
     
     this.emitEvent('recording', { status: 'stopped', duration: this.getRecordingDuration() });
   }
@@ -170,12 +155,12 @@ export class EnhancedASRClient {
     }));
   }
   
-  destroy(): void {
+  async destroy(): Promise<void> {
     this.isDestroyed = true;
-    this.disconnect();
     if (get(this._state).isRecording) {
-      this.stopRecording();
+      await this.stopRecording();
     }
+    this.disconnect();
     this.eventListeners.clear();
   }
   

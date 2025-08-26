@@ -227,7 +227,7 @@
     
     try {
       await asrClient.stopRecording();
-      await audioProcessor.cleanup();
+      audioProcessor.stop(); // Only stop, don't cleanup - preserve media stream
       
       stopDurationTimer();
       recordingStartTime = null;
@@ -273,9 +273,9 @@
   }
   
   // Cleanup
-  function cleanup() {
+  async function cleanup() {
     stopDurationTimer();
-    asrClient?.destroy();
+    await asrClient?.destroy();
     audioProcessor?.cleanup();
   }
   
