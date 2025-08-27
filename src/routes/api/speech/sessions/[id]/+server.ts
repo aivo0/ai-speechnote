@@ -52,11 +52,11 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
       return json({ error: 'Session ID required' }, { status: 400 });
     }
 
-    const updates = await request.json();
+    const updates = await request.json() as Record<string, any>;
     const allowedFields = ['title', 'status', 'language', 'totalDuration', 'segmentCount', 'wsUrl', 'metadata'];
     
     // Filter only allowed fields
-    const filteredUpdates: any = {};
+    const filteredUpdates: Record<string, any> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (allowedFields.includes(key)) {
         if (key === 'metadata' && value) {

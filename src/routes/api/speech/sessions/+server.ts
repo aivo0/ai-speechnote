@@ -44,7 +44,11 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body = await request.json() as {
+      title?: string;
+      language?: string;
+      metadata?: any;
+    };
     const { title, language = 'et', metadata } = body;
 
     const sessionId = crypto.randomUUID();

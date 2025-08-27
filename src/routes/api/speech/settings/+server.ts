@@ -72,7 +72,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
       return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const updates = await request.json();
+    const updates = await request.json() as Record<string, any>;
     const allowedFields = [
       'defaultLanguage',
       'wsUrl',
@@ -86,7 +86,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
     ];
     
     // Filter only allowed fields
-    const filteredUpdates: any = {};
+    const filteredUpdates: Record<string, any> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (allowedFields.includes(key)) {
         if (key === 'metadata' && value) {

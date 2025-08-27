@@ -18,7 +18,7 @@
   let editText = $state(segment.text);
   let showActions = $state(false);
   let copySuccess = $state(false);
-  let textArea: HTMLTextAreaElement;
+  let textArea = $state<HTMLTextAreaElement>();
   
   // Watch for changes to segment text
   $effect(() => {
@@ -228,6 +228,7 @@
           onclick={startEdit}
           class="p-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-400 transition-colors"
           title="Edit text"
+          aria-label="Edit text"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -239,6 +240,7 @@
           onclick={deleteSegment}
           class="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:text-red-400 transition-colors"
           title="Delete segment"
+          aria-label="Delete segment"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -250,6 +252,7 @@
           onclick={saveEdit}
           class="p-2 rounded-md bg-green-100 hover:bg-green-200 text-green-600 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:text-green-400 transition-colors"
           title="Save changes (Ctrl+Enter)"
+          aria-label="Save changes"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -261,6 +264,7 @@
           onclick={cancelEdit}
           class="p-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-400 transition-colors"
           title="Cancel editing (Escape)"
+          aria-label="Cancel editing"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

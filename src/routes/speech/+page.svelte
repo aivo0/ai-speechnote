@@ -303,6 +303,7 @@
                       : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
                   }`}
                   title="Toggle auto-scroll"
+                  aria-label="Toggle auto-scroll"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
@@ -374,6 +375,7 @@
         <button
           onclick={() => showSessionsList = false}
           class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+          aria-label="Close sessions list"
         >
           <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -438,6 +440,7 @@
         <button
           onclick={() => showExportDialog = false}
           class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+          aria-label="Close export dialog"
         >
           <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -448,10 +451,11 @@
       <div class="p-6 space-y-4">
         <!-- Format Selection -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label for="export-format" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Format
           </label>
           <select 
+            id="export-format"
             bind:value={exportOpts.format}
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
           >

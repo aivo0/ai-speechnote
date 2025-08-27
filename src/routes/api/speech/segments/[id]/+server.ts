@@ -16,11 +16,11 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
       return json({ error: 'Segment ID required' }, { status: 400 });
     }
 
-    const updates = await request.json();
+    const updates = await request.json() as Record<string, any>;
     const allowedFields = ['text', 'partialText', 'confidence', 'duration', 'language', 'alternatives', 'isEdited', 'metadata'];
     
     // Filter only allowed fields
-    const filteredUpdates: any = {};
+    const filteredUpdates: Record<string, any> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (allowedFields.includes(key)) {
         if ((key === 'alternatives' || key === 'metadata') && value) {
@@ -39,10 +39,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 
     // First get the segment to verify ownership through session
     const [existingSegment] = await db
-      .select({
-        segment: speechSegment,
-        session: speechSession
-      })
+      .select()
       .from(speechSegment)
       .innerJoin(speechSession, eq(speechSegment.sessionId, speechSession.id))
       .where(
@@ -93,10 +90,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 
     // First get the segment to verify ownership and get session info
     const [existingSegment] = await db
-      .select({
-        segment: speechSegment,
-        session: speechSession
-      })
+      .select()
       .from(speechSegment)
       .innerJoin(speechSession, eq(speechSegment.sessionId, speechSession.id))
       .where(
@@ -119,10 +113,10 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
     await db
       .update(speechSession)
       .set({
-        segmentCount: Math.max(0, existingSegment.session.segmentCount - 1),
+        segmentCount: Math.max(0, (existingSegment.speech_session.segmentCount || 0) - 1),
         updatedAt: new Date()
       })
-      .where(eq(speechSession.id, existingSegment.segment.sessionId));
+      .where(eq(speechSession.id, existingSegment.speech_segment.sessionId));
 
     return json({
       success: true,

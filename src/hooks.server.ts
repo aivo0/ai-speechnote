@@ -42,8 +42,13 @@ const handleDatabase: Handle = async ({ event, resolve }) => {
       headers: event.request.headers,
     });
 
-    event.locals.session = sessionData?.session ?? null;
-    event.locals.user = sessionData?.user ?? null;
+    // Type guard the session data to ensure proper typing
+    event.locals.session = (sessionData?.session && 
+      typeof sessionData.session === 'object' && 
+      'id' in sessionData.session) ? sessionData.session as any : null;
+    event.locals.user = (sessionData?.user && 
+      typeof sessionData.user === 'object' && 
+      'id' in sessionData.user) ? sessionData.user as any : null;
 
   } catch (error) {
     console.error('Failed to setup databases:', error);

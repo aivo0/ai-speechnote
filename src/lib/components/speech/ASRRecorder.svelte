@@ -25,7 +25,7 @@
     onError = undefined 
   }: RecorderProps = $props();
   
-  // Component state
+  // Component asrStateData
   let asrClient: EnhancedASRClient | null = null;
   let audioProcessor: AudioProcessor | null = null;
   let recordingStartTime: number | null = null;
@@ -33,8 +33,8 @@
   let durationTimer: number | null = null;
   let isConnecting = $state(false);
   
-  // Reactive state from stores - use derived to avoid infinite loops
-  let state = $derived($asrState);
+  // Reactive asrStateData from stores using $derived
+  let asrStateData = $derived($asrState);
   let currentSessionData = $derived($currentSession);
   let segments = $derived($currentSegments);
   let metrics = $derived($audioMetrics);
@@ -52,7 +52,7 @@
       asrClient.addEventListener('error', handleErrorEvent);
       
       // Subscribe to client state changes
-      asrClient.state.subscribe(newState => {
+      asrClient.state.subscribe((newState: any) => {
         asrState.set(newState);
       });
       
@@ -164,7 +164,7 @@
   
   function handleAudioData(audioData: Float32Array) {
     // Send audio data to WebSocket client
-    if (asrClient && state.isRecording && !state.isPaused) {
+    if (asrClient && asrStateData.isRecording && !asrStateData.isPaused) {
       // The WebSocket client will handle the audio data
       // This is where the enhanced client would queue and send the audio
     }
@@ -208,17 +208,17 @@
         await audioProcessor.initialize();
       } catch (initError) {
         // If already initialized, that's fine - just continue
-        console.log('Audio processor already initialized:', initError.message);
+        console.log('Audio processor already initialized:', (initError as Error).message);
       }
       
       // Set up audio data callback
       audioProcessor.onAudioData((data) => {
         // Send to WebSocket client
-        asrClient.sendAudioData(data);
+        asrClient?.sendAudioData(data);
         console.log('Audio data sent to WebSocket:', data.length);
       });
       
-      // Start audio processing first, then update WebSocket state
+      // Start audio processing first, then update WebSocket asrStateData
       await audioProcessor.start();
       await asrClient.startRecording();
       
@@ -254,13 +254,13 @@
     
     try {
       // Finalize any partial text as a segment before stopping
-      const state = $asrState;
-      if (state.partialText && state.partialText.trim()) {
+      const asrStateData = $asrState;
+      if (asrStateData.partialText && asrStateData.partialText.trim()) {
         const segment: SpeechSegment = {
           id: crypto.randomUUID(),
           sessionId: currentSessionData?.id || '',
           sequence: segments.length,
-          text: state.partialText.trim(),
+          text: asrStateData.partialText.trim(),
           partialText: null,
           confidence: null,
           duration: null,
@@ -341,11 +341,11 @@
   }
   
   // Reactive getters
-  let canConnect = $derived(!state.isConnected && !state.isRecording && !isConnecting);
-  let canRecord = $derived(state.isConnected && !state.isRecording && currentSessionData !== null);
-  let canPause = $derived(state.isRecording && !state.isPaused);
-  let canResume = $derived(state.isRecording && state.isPaused);
-  let canStop = $derived(state.isRecording);
+  let canConnect = $derived(!asrStateData.isConnected && !asrStateData.isRecording && !isConnecting);
+  let canRecord = $derived(asrStateData.isConnected && !asrStateData.isRecording && currentSessionData !== null);
+  let canPause = $derived(asrStateData.isRecording && !asrStateData.isPaused);
+  let canResume = $derived(asrStateData.isRecording && asrStateData.isPaused);
+  let canStop = $derived(asrStateData.isRecording);
 </script>
 
 <div class="asr-recorder bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6">
@@ -360,32 +360,32 @@
       {/if}
     </div>
     
-    <ConnectionStatus {state} {isConnecting} showDetails={true} />
+    <ConnectionStatus state={asrStateData} {isConnecting} showDetails={true} />
   </div>
   
   <!-- Audio Visualizer -->
   <div class="mb-6">
-    <AudioVisualizer {metrics} isActive={state.isRecording && !state.isPaused} />
+    <AudioVisualizer {metrics} isActive={asrStateData.isRecording && !asrStateData.isPaused} />
   </div>
   
   <!-- Recording Duration -->
-  {#if state.isRecording || recordingDuration > 0}
+  {#if asrStateData.isRecording || recordingDuration > 0}
     <div class="text-center mb-6">
       <div class="text-3xl font-mono font-bold text-gray-900 dark:text-white">
         {formatDuration(recordingDuration)}
       </div>
       <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-        {state.isPaused ? 'Paused' : state.isRecording ? 'Recording' : 'Stopped'}
+        {asrStateData.isPaused ? 'Paused' : asrStateData.isRecording ? 'Recording' : 'Stopped'}
       </div>
     </div>
   {/if}
   
   <!-- Partial Text Display -->
-  {#if state.partialText}
+  {#if asrStateData.partialText}
     <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
       <div class="text-sm text-blue-600 dark:text-blue-400 mb-2">Live transcription:</div>
       <div class="text-gray-900 dark:text-white font-medium">
-        {state.partialText}
+        {asrStateData.partialText}
         <span class="inline-block w-2 h-5 bg-blue-500 animate-pulse ml-1"></span>
       </div>
     </div>
@@ -394,7 +394,7 @@
   <!-- Control Buttons -->
   <div class="flex items-center justify-center gap-4 mb-6">
     <!-- Connect Button -->
-    {#if !state.isConnected}
+    {#if !asrStateData.isConnected}
       <button
         onclick={connect}
         disabled={!canConnect}
@@ -418,7 +418,7 @@
     {/if}
     
     <!-- Record Button -->
-    {#if !state.isRecording}
+    {#if !asrStateData.isRecording}
       <button
         onclick={startRecording}
         disabled={!canRecord}
@@ -432,7 +432,7 @@
     {:else}
       <!-- Pause/Resume and Stop Buttons -->
       <div class="flex gap-3">
-        {#if state.isPaused}
+        {#if asrStateData.isPaused}
           <button
             onclick={resumeRecording}
             disabled={!canResume}
@@ -506,14 +506,14 @@
   {/if}
   
   <!-- Error Display -->
-  {#if state.error}
+  {#if asrStateData.error}
     <div class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
       <div class="flex items-center gap-2 text-red-800 dark:text-red-200">
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
         </svg>
         <span class="font-medium">Error:</span>
-        <span>{state.error}</span>
+        <span>{asrStateData.error}</span>
       </div>
     </div>
   {/if}

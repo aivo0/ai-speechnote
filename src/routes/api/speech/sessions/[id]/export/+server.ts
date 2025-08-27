@@ -32,7 +32,13 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
     }
 
     // Get export options
-    const body = await request.json();
+    const body = await request.json() as {
+      format?: string;
+      includeMetadata?: boolean;
+      includeTimestamps?: boolean;
+      includeAlternatives?: boolean;
+      segmentSeparator?: string;
+    };
     const {
       format = 'txt',
       includeMetadata = false,

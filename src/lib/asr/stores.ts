@@ -79,12 +79,19 @@ export const isLoading = writable({
   saving: false
 });
 
-// Error states
-export const errors = writable({
-  connection: null as string | null,
-  session: null as string | null,
-  audio: null as string | null,
-  general: null as string | null
+// Error states type
+type ErrorState = {
+  connection: string | null;
+  session: string | null;
+  audio: string | null;
+  general: string | null;
+};
+
+export const errors = writable<ErrorState>({
+  connection: null,
+  session: null,
+  audio: null,
+  general: null
 });
 
 // UI preferences
@@ -215,7 +222,8 @@ export const sessionActions = {
         throw new Error(`Failed to create session: ${response.statusText}`);
       }
       
-      const { data: session } = await response.json();
+      const response_data = await response.json() as { data: SpeechSession };
+      const session = response_data.data;
       
       // Update stores
       currentSession.set(session);
@@ -255,13 +263,15 @@ export const sessionActions = {
         throw new Error(`Failed to load session: ${sessionResponse.statusText}`);
       }
       
-      const { data: session } = await sessionResponse.json();
+      const session_response_data = await sessionResponse.json() as { data: SpeechSession };
+      const session = session_response_data.data;
       currentSession.set(session);
       
       // Load session segments
       const segmentsResponse = await fetch(`/api/speech/sessions/${sessionId}/segments`);
       if (segmentsResponse.ok) {
-        const { data: segments } = await segmentsResponse.json();
+        const segments_response_data = await segmentsResponse.json() as { data: SpeechSegment[] };
+        const segments = segments_response_data.data;
         currentSegments.set(segments);
       } else {
         currentSegments.set([]);
@@ -289,7 +299,8 @@ export const sessionActions = {
         throw new Error(`Failed to update session: ${response.statusText}`);
       }
       
-      const { data: updatedSession } = await response.json();
+      const updated_response_data = await response.json() as { data: SpeechSession };
+      const updatedSession = updated_response_data.data;
       
       // Update current session if it matches
       const current = get(currentSession);
@@ -404,7 +415,8 @@ export const settingsActions = {
     try {
       const response = await fetch('/api/speech/settings');
       if (response.ok) {
-        const { data: settings } = await response.json();
+        const settings_response_data = await response.json() as { data: SpeechSettings };
+        const settings = settings_response_data.data;
         speechSettings.set(settings);
       }
     } catch (error) {
@@ -425,7 +437,8 @@ export const settingsActions = {
       });
       
       if (response.ok) {
-        const { data: settings } = await response.json();
+        const settings_update_response_data = await response.json() as { data: SpeechSettings };
+        const settings = settings_update_response_data.data;
         speechSettings.set(settings);
         return true;
       }
@@ -442,11 +455,11 @@ export const settingsActions = {
 
 // Error management
 export const errorActions = {
-  clearError(type: keyof typeof errors): void {
+  clearError(type: keyof ErrorState): void {
     errors.update(state => ({ ...state, [type]: null }));
   },
   
-  setError(type: keyof typeof errors, message: string): void {
+  setError(type: keyof ErrorState, message: string): void {
     errors.update(state => ({ ...state, [type]: message }));
   },
   

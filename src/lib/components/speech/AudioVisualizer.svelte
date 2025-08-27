@@ -77,14 +77,16 @@
       const height = rect.height;
       
       // Clear canvas with proper dimensions
-      ctx.clearRect(0, 0, width, height);
-      
-      if (!isActive || !displayMetrics) {
-        // Draw inactive state
-        drawInactiveState(ctx, width, height);
-      } else {
-        // Draw active visualization
-        drawActiveVisualization(ctx, width, height);
+      if (ctx) {
+        ctx.clearRect(0, 0, width, height);
+        
+        if (!isActive || !displayMetrics) {
+          // Draw inactive state
+          drawInactiveState(ctx, width, height);
+        } else {
+          // Draw active visualization
+          drawActiveVisualization(ctx, width, height);
+        }
       }
       
       animationFrame = requestAnimationFrame(draw);

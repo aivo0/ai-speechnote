@@ -11,7 +11,18 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body = await request.json() as {
+      sessionId: string;
+      sequence: number;
+      text: string;
+      partialText?: string | null;
+      confidence?: number | null;
+      duration?: number | null;
+      language?: string | null;
+      alternatives?: string | null;
+      metadata?: string | null;
+    };
+    
     const {
       sessionId,
       sequence,
@@ -69,7 +80,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     await db
       .update(speechSession)
       .set({
-        segmentCount: session.segmentCount + 1,
+        segmentCount: (session.segmentCount || 0) + 1,
         updatedAt: now
       })
       .where(eq(speechSession.id, sessionId));
