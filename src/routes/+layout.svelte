@@ -37,8 +37,6 @@
 				</div>
 				
 				<div class="hidden md:flex items-center space-x-8">
-					<a href="/#features" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_features()}</a>
-					<a href="/#pricing" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_pricing()}</a>
 					<a href="/help" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_help()}</a>
 					
 					{#if user}
@@ -49,14 +47,14 @@
 							Speech
 						</a>
 						<a href="/dashboard" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_dashboard()}</a>
-						<form method="POST" action="/auth/logout">
+						<form method="POST" action="/api/auth/sign-out">
 							<button type="submit" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">
 								{m.nav_signout()}
 							</button>
 						</form>
 					{:else}
-						<a href="/auth/login" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_signin()}</a>
-						<a href="/auth/signup" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition">
+						<a href="/signin" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">{m.nav_signin()}</a>
+						<a href="/register" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition">
 							{m.nav_getstarted()}
 						</a>
 					{/if}
@@ -86,8 +84,6 @@
 				<div>
 					<h3 class="font-semibold text-gray-900 dark:text-white mb-4">{m.footer_product()}</h3>
 					<ul class="space-y-2">
-						<li><a href="/#features" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_features()}</a></li>
-						<li><a href="/#pricing" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_pricing()}</a></li>
 						<li><a href="/download" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{m.footer_download()}</a></li>
 					</ul>
 				</div>
